@@ -1,0 +1,73 @@
+:root {
+  --background: #121212;
+  --surface: #000000;
+  --primary: #BB86FC;
+  --primaryVariant: #3700B3;
+  --secondary: #03DAC6;
+}
+
+body {
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    background-color: var(--surface);
+    color: white;
+    font-family: 'Roboto', sans-serif;
+    font-size: 2rem;
+}
+  
+.container {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+}
+
+.card {
+  width: 50%;
+  height: 70%;
+  background-color: var(--background);
+  margin: auto;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.cardItem {
+  width: 90%;
+  height: 95%;
+  padding-top: 5%;
+  padding-left: 5%;
+  padding-right: 5%;
+  display: flex;
+  flex-direction: row;
+  /* flex: 0 1 auto; */
+  justify-content: flex-start;
+}
+
+.cardContent:not(:first-child) {
+  margin-left: 5%;
+}
+
+.cardContent {
+  width: fit-content;
+  height: fit-content;
+  display: flex;
+  flex-direction: column;
+}
+
+.small > label {
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+
+button {
+  background-color: var(--primaryVariant);
+  margin-top: 0.5rem;
+  border-radius: 5px;
+  border: none;
+  font-size: 1.5rem;
+  color: white;
+  cursor: pointer;
+}

@@ -1,0 +1,86 @@
+<div class="container">
+    <div class="card">
+        <div class="cardItem">
+            <div class="cardContent">
+                <label for="voznik">Voznik:</label>
+                <select name="voznik" id="voznik">
+                    <option value="Samo Palčič">Samo Palčič</option>
+                    <option value="Tom Sraka">Tomaž Sraka</option>
+                </select>
+            </div>
+            <div class="cardContent">
+                Razlog:
+                <br>
+                <span class="small">
+                    <label for="dostavaProtetike">Dostava Protetike:</label>
+                    <input type="checkbox" name="dostavaProtetike" id="dostavaProtetike">
+                </span>
+                <span class="small">
+                    <label for="prevzemProtetike">Prevzem Protetike:</label>
+                    <input type="checkbox" name="prevzemProtetike" id="prevzemProtetike">
+                </span>
+                <span class="small">
+                    <label for="nabavaMateriala">Nabava materiala:</label>
+                    <input type="checkbox" name="nabavaMateriala" id="nabavaMateriala">
+                </span>
+                <span class="small">
+                    <label for="dostavaDokumentov">Dostava dokumentov:</label>
+                    <input type="checkbox" name="dostavaDokumentov" id="dostavaDokumentov">
+                </span>
+                
+            </div>
+        </div>    
+        <div class="cardItem">
+            <div class="cardContent">
+                <span>
+                    <label for="zacetek">Začetek:</label>
+                    <input type="datetime-local" name="zacetek" id="zacetek">
+                </span>
+                <span>
+                  <label for="konec">Konec:</label>
+                    <input type="datetime-local" name="konec" id="konec">  
+                </span>
+            </div>
+            <div class="cardContent">
+                Dodaj relacije:
+                <span>
+                    <label for="od">Od:</label>
+                    <select name="od" id="od">
+                        <option value="0">Laboratorij</option>
+                        <option value="1">Dr Marolt</option>
+                        <option value="2">Dr Olujić</option>
+                        <option value="4">Dr Marič</option>
+                        <option value="9">Dr Velkavrh</option>
+                        <option value="3">Dental Market</option>
+                        <option value="5">Dentalia</option>
+                        <option value="6">Prodent</option>
+                        <option value="7">Prima dent</option>
+                        <option value="8">Sanolabor</option>
+                    </select>
+                </span>
+                <span>
+                    <label for="do">Do:</label>    
+                    <select name="do" id="do">
+                        <option value="0">Laboratorij</option>
+                        <option value="1">Dr Marolt</option>
+                        <option value="2">Dr Olujić</option>
+                        <option value="4">Dr Marič</option>
+                        <option value="9">Dr Velkavrh</option>
+                        <option value="3">Dental Market</option>
+                        <option value="5">Dentalia</option>
+                        <option value="6">Prodent</option>
+                        <option value="7">Prima dent</option>
+                        <option value="8">Sanolabor</option>
+                    </select> 
+                </span>
+                <span>
+                    <button type="button" id="dodajRelacijo">Dodaj</button>
+                </span>
+            </div>
+        </div>
+        <div class="cardItem">
+            <div class="cardContent" id="relacijeContainer">
+            
+        </div>
+    </div>
+</div>
