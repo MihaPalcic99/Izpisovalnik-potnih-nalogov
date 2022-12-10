@@ -13,8 +13,8 @@ let distanceMatrix = [
 
 let lokacije = [
     "Laboratorij",
-    "Marolto",
-    "Segerj",
+    "Dr Marolt",
+    "Dr Olujić",
     "Dental market",
     "dr. Marič",
     "Dentalia",
@@ -43,6 +43,9 @@ window.onload = function(){
         }else {
             relacije.add(JSON.stringify({od: od.value, do: doo.value}));
         }
+        //select the od value to be the same as the do value, and the do value to be the defaullt blank value.
+        od.value = doo.value;
+        doo.value = "-";
         displayRelacije();
     }
 
@@ -66,10 +69,12 @@ window.onload = function(){
                 let relacijaObj = JSON.parse(relacija);
                 let od = relacijaObj.od;
                 let doo = relacijaObj.do;
-                li.innerHTML = lokacije[od] + " - " + lokacije[doo] + " " + distanceMatrix[od][doo] * 2;
+                li.innerHTML = lokacije[od] + " <---> " + lokacije[doo] + " " + distanceMatrix[od][doo] * 2;
                 totalDistance += distanceMatrix[od][doo] * 2;
+                totalDistance = Math.round(totalDistance * 100) / 100;
                 let button = document.createElement("button");
                 button.innerHTML = "Odstrani";
+                button.setAttribute("style", "margin-left: 10px");
                 button.addEventListener("click", function(){
                     relacije.delete(relacija);
                     displayRelacije();
