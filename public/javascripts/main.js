@@ -28,12 +28,17 @@ let stNaloga = 1;
 
 let relacije = new Set();
 
+
+
 window.onload = function(){
     let od = document.getElementById("od");
     let doo = document.getElementById("do");
     let totalDistance = 0;
 
     document.getElementById("dodajRelacijo").addEventListener("click", logit);
+    document.getElementById("shrani").addEventListener("click", shraniPdf);
+
+    
 
     function logit(){
         if(od.value == doo.value) {
@@ -87,5 +92,24 @@ window.onload = function(){
             ul.appendChild(li);
         }
     }
+
+    function shraniPdf(){
+        let url = "pdf/PotniNalog.pdf";
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', url, true);
+        xhr.responseType = 'arraybuffer';
+        xhr.onload = function() {
+			if (this.status == 200) {
+				let rawPdf = this.response;
+                console.log(pdfform().list_fields(rawPdf));
+			} else {
+				on_error('failed to load URL:' + this.status);
+			}
+		};
+
+		xhr.send();
+    }
+
+    
 
 }
