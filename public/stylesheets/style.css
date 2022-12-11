@@ -34,6 +34,16 @@ body {
   flex-direction: column;
 }
 
+form {
+  width: 50%;
+  height: 70%;
+  background-color: var(--background);
+  margin: auto;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
 .cardItem {
   width: 90%;
   height: 95%;

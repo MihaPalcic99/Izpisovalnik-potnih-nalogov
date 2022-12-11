@@ -25,12 +25,17 @@ let lokacije = [
 ]
 
 let stNaloga = 1;
-
 let relacije = new Set();
 
 
 
 window.onload = function(){
+    //get the stNaloga from local storage
+    if(localStorage.getItem("stNaloga") != null){
+        stNaloga = localStorage.getItem("stNaloga");
+    }else {
+        stNaloga = 1;
+    }
     let od = document.getElementById("od");
     let doo = document.getElementById("do");
     let totalDistance = 0;
@@ -38,9 +43,19 @@ window.onload = function(){
     document.getElementById("dodajRelacijo").addEventListener("click", logit);
     document.getElementById("shrani").addEventListener("click", shraniPdf);
 
+    let potuje = document.getElementById("voznik");
+    let relacija = document.getElementById("relacijeContainer");
+    let odhod = document.getElementById("zacetek");
+    let prihod = document.getElementById("konec");
+    let DP = document.getElementById("dostavaProtetike");
+    let PP = document.getElementById("prevzemProtetike");
+    let NM = document.getElementById("nabavaMateriala");
+    let DD = document.getElementById("dostavaDokumentov");
+    let tarifa = 0.43;
+    let datum = new Date().toLocaleDateString("sl-SI");
     
-
     function logit(){
+        console.log("Trying to add relacija");
         if(od.value == doo.value) {
             return;
         }else if(od.value > doo.value){
@@ -93,23 +108,81 @@ window.onload = function(){
         }
     }
 
-    function shraniPdf(){
+    async function shraniPdf(){
         let url = "pdf/PotniNalog.pdf";
         var xhr = new XMLHttpRequest();
         xhr.open('GET', url, true);
         xhr.responseType = 'arraybuffer';
-        xhr.onload = function() {
+        xhr.onload = async function() {
 			if (this.status == 200) {
 				let rawPdf = this.response;
-                console.log(pdfform().list_fields(rawPdf));
+                let tempRazlog = "";
+                console.log("RELACIJE: " + new Array(...relacije).join(' '));
+                if(DP.checked) tempRazlog += "Dostava protetike  ";
+                if(PP.checked) tempRazlog += "Dobava protetike  ";
+                if(NM.checked) tempRazlog += "Nabava materiala  ";
+                if(DD.checked) tempRazlog += "Dostava dokumentov  ";
+                let tempRelacije = new Set;
+                relacije.forEach(function(relacija){
+                    let relacijaObj = JSON.parse(relacija);
+                    let od = relacijaObj.od;
+                    let doo = relacijaObj.do;
+                    tempRelacije.add(od);
+                    tempRelacije.add(doo);
+                });
+                console.log("Trenutni datum je: " + datum);
+                console.log("Tranutni stNaloga je: " + stNaloga);
+                let out = pdfform().transform(rawPdf, {
+                    "Datum": [datum],
+                    "Potuje": [potuje.value],
+                    "Odhod": [odhod.value],
+                    "Prihod": [prihod.value],
+                    "Tarifa": [tarifa],
+                    "Trajanje": [Math.floor((new Date(prihod.value) - new Date(odhod.value)) / 1000 / 60 / 60) + "h " + Math.floor((new Date(prihod.value) - new Date(odhod.value)) / 1000 / 60 % 60) + "min"],
+                    "Kilometri": [totalDistance],
+                    "StNaloga": [stNaloga],
+                    "KoncnoIzplacilo": [Math.round(totalDistance * tarifa * 100) / 100],
+                    "SkupajKilometrina": [Math.round(totalDistance * tarifa * 100) / 100],
+                    "DodatniStroski": [0],
+                    //Take all the numbers in tempRelacije and get the coresponding names from lokacije and join them with a /.
+                    "Relacija": [new Array(...tempRelacije).map(function(relacija){
+                        return lokacije[relacija];
+                    }).join(' / ')],
+                    "Razlog": [tempRazlog]
+
+                });
+                let secondOut = await PDFLib.PDFDocument.load(out);
+                //ad a page to the pdf
+                let page = secondOut.addPage();
+                //ad a image to the page
+                /* var img = new Image();
+                img.src = "images/image1.png"; */
+                //save the pdf
+                out = await secondOut.save();
+
+                //Create a new blob with the pdf data and the type of the file. Name the file PotniNalog{{stNaloga}}/{{datum}}.pdf
+                let blob = new Blob([out], {type: "application/pdf"});
+                //Create a new a element and set its href to the blob url, and its download attribute to the name of the file. Click the a element to download the file and then remove it from the dom.
+                let a = document.createElement("a");
+                a.href = URL.createObjectURL(blob);
+                a.download = "PotniNalog" + stNaloga + "_" + ".pdf";
+                /* a.download = "PotniNalog" + stNaloga + ".pdf"; */
+                a.click();
+                a.remove();
+                stNaloga++;
+                localStorage.setItem("stNaloga", stNaloga);
+                //Reset the form to its default values.
+                document.getElementById("potniNalogForm").reset();
+                //Reset the relacije set and remove all the relacije from the list.
+                relacije = new Set();
+                displayRelacije();
+
 			} else {
-				on_error('failed to load URL:' + this.status);
+				alert("Napaka pri nalaganju PDF dokumenta.");
 			}
 		};
 
 		xhr.send();
     }
-
-    
 
 }
