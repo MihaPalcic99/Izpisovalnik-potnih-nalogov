@@ -187,8 +187,13 @@ window.onload = function(){
                 //for each file in slikeUrl, add a page to the pdf, load the image, and add it to the page.
                 for(let i = 0; i < slikeUrl.length; i++){
                     let page = secondOut.addPage();
-                    //load the image depending on the type of the file.
-                    let img = await secondOut.embedJpg(slikeUrl[i]);
+                    let img;
+                    try {
+                        img = await secondOut.embedJpg(slikeUrl[i]);
+                    } catch(e){
+                        img = await secondOut.embedPng(slikeUrl[i]);
+                    }
+                    
                     /* let img = await secondOut.embedPng(slikeUrl[i]); */
                     let { width, height } = page.getSize();
 
