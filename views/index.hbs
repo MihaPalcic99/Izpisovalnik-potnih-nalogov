@@ -12,23 +12,11 @@
             <div class="cardContent">
                 Razlog:
                 <br>
-                <span class="small">
-                    <label for="dostavaProtetike">Dostava Protetike:</label>
-                    <input type="checkbox" name="dostavaProtetike" id="dostavaProtetike">
-                </span>
-                <span class="small">
-                    <label for="prevzemProtetike">Prevzem Protetike:</label>
-                    <input type="checkbox" name="prevzemProtetike" id="prevzemProtetike">
-                </span>
-                <span class="small">
-                    <label for="nabavaMateriala">Nabava materiala:</label>
-                    <input type="checkbox" name="nabavaMateriala" id="nabavaMateriala">
-                </span>
-                <span class="small">
-                    <label for="dostavaDokumentov">Dostava dokumentov:</label>
-                    <input type="checkbox" name="dostavaDokumentov" id="dostavaDokumentov">
-                </span>
-                
+                <input type="text" name="razlog" id="razlog">
+            </div>
+            <div class="cardContent">
+                <label for="kilometrina">Trenutna kilometrina:</label>
+                <input type="number" name="kilometrina" id="kilometrina" min="0" max="2" value="0.43" step="0.01">
             </div>
         </div>    
         <div class="cardItem">
@@ -80,12 +68,18 @@
                     <button type="button" id="dodajRelacijo">Dodaj</button>
                 </span>
             </div>
+            <div class="cardContent">
+                <label for="dodatniStroski">Dodatni stroški:</label>
+                <input type="number" name="dodatniStroski" id="dodatniStroski" min="0" value="0" step="1">
+            </div>
+            <div class="cardContent">
+                <labe for="slika">Priponka</labe>
+                <input type="file" name="slika" id="slika" accept="image, pdf" multiple>
+            </div>
         </div>
         <div class="cardItem">
             <div class="cardContent" id="relacijeContainer"></div>
-            <div class="cardContent">
-                <button type="button" id="shrani">Shrani</button>
-            </div>
+            <div class="cardContent" id="slikeContainer"></div>
         </div>
         {{!-- <div class="cardItem">
             <div class="cardContent">
@@ -95,3 +89,4 @@
     </form>
     {{!-- </div> --}}
 </div>
+<button type="button" id="shrani">Shrani</button>

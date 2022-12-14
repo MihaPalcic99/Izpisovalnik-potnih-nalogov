@@ -1,0 +1,18 @@
+version: "1.0"
+
+services:
+  node-api:
+    container_name: nalog
+    restart: always
+    ports:
+      - "3000:3000"
+    image: nalog-node-js
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    environment:
+      - NODE_ENV=docker
+    command: "npm start"

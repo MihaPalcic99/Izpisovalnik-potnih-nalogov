@@ -47,15 +47,55 @@ window.onload = function(){
     let relacija = document.getElementById("relacijeContainer");
     let odhod = document.getElementById("zacetek");
     let prihod = document.getElementById("konec");
-    let DP = document.getElementById("dostavaProtetike");
-    let PP = document.getElementById("prevzemProtetike");
-    let NM = document.getElementById("nabavaMateriala");
-    let DD = document.getElementById("dostavaDokumentov");
-    let tarifa = 0.43;
+    let razlog = document.getElementById("razlog");
+    let tarifa = document.getElementById("kilometrina");
     let datum = new Date().toLocaleDateString("sl-SI");
+    let dodatniStroski = document.getElementById("dodatniStroski");
+    let slika = document.getElementById("slika");
+
+    let slikeUrl = [];
+
+    //add a event listener to the slika file input, that will display the names of all files in the input with the id slikeContainer and load the files into the array slikeUrl using the FileReader API. Also add a button to remove the file from the input and the array.
+    slika.addEventListener("change", function(){
+        let slikeContainer = document.getElementById("slikeContainer");
+        slikeContainer.innerHTML = "";
+        for(let i = 0; i < slika.files.length; i++){
+            let li = document.createElement("li");
+            li.innerHTML = slika.files[i].name;
+            let button = document.createElement("button");
+            button.innerHTML = "X";
+            button.addEventListener("click", function(){
+                slika.files = [...slika.files.slice(0, i), ...slika.files.slice(i+1)];
+                slikeUrl = [...slikeUrl.slice(0, i), ...slikeUrl.slice(i+1)];
+                slikeContainer.removeChild(li);
+            });
+            li.appendChild(button);
+            slikeContainer.appendChild(li);
+            let reader = new FileReader();
+            reader.onload = function(e){
+                slikeUrl.push(e.target.result);
+            }
+            /* reader.readAsDataURL(slika.files[i]); */
+            reader.readAsArrayBuffer(slika.files[i]);
+        }
+        console.log(slikeUrl);
+    });
+
+
+
+    //check the local storage for the value tarifa and set the value of the input with id kilometrina to that value if it exists.
+    if(localStorage.getItem("tarifa") != null){
+        tarifa.value = localStorage.getItem("tarifa");
+    }else {
+        tarifa.value = tarifa.value;
+    }
+    tarifa.addEventListener("change", function(){
+        localStorage.setItem("tarifa", tarifa.value);
+    });
+
+    displayRelacije();
     
     function logit(){
-        console.log("Trying to add relacija");
         if(od.value == doo.value) {
             return;
         }else if(od.value > doo.value){
@@ -89,8 +129,8 @@ window.onload = function(){
                 let relacijaObj = JSON.parse(relacija);
                 let od = relacijaObj.od;
                 let doo = relacijaObj.do;
-                li.innerHTML = lokacije[od] + " <---> " + lokacije[doo] + " " + distanceMatrix[od][doo] * 2;
-                totalDistance += distanceMatrix[od][doo] * 2;
+                li.innerHTML = lokacije[od] + " <---> " + lokacije[doo] + " " + distanceMatrix[od][doo];
+                totalDistance += distanceMatrix[od][doo];
                 totalDistance = Math.round(totalDistance * 100) / 100;
                 let button = document.createElement("button");
                 button.innerHTML = "Odstrani";
@@ -116,12 +156,6 @@ window.onload = function(){
         xhr.onload = async function() {
 			if (this.status == 200) {
 				let rawPdf = this.response;
-                let tempRazlog = "";
-                console.log("RELACIJE: " + new Array(...relacije).join(' '));
-                if(DP.checked) tempRazlog += "Dostava protetike  ";
-                if(PP.checked) tempRazlog += "Dobava protetike  ";
-                if(NM.checked) tempRazlog += "Nabava materiala  ";
-                if(DD.checked) tempRazlog += "Dostava dokumentov  ";
                 let tempRelacije = new Set;
                 relacije.forEach(function(relacija){
                     let relacijaObj = JSON.parse(relacija);
@@ -130,33 +164,56 @@ window.onload = function(){
                     tempRelacije.add(od);
                     tempRelacije.add(doo);
                 });
-                console.log("Trenutni datum je: " + datum);
-                console.log("Tranutni stNaloga je: " + stNaloga);
                 let out = pdfform().transform(rawPdf, {
                     "Datum": [datum],
                     "Potuje": [potuje.value],
                     "Odhod": [odhod.value],
                     "Prihod": [prihod.value],
-                    "Tarifa": [tarifa],
+                    "Tarifa": [tarifa.value],
                     "Trajanje": [Math.floor((new Date(prihod.value) - new Date(odhod.value)) / 1000 / 60 / 60) + "h " + Math.floor((new Date(prihod.value) - new Date(odhod.value)) / 1000 / 60 % 60) + "min"],
                     "Kilometri": [totalDistance],
                     "StNaloga": [stNaloga],
-                    "KoncnoIzplacilo": [Math.round(totalDistance * tarifa * 100) / 100],
-                    "SkupajKilometrina": [Math.round(totalDistance * tarifa * 100) / 100],
-                    "DodatniStroski": [0],
+                    "KoncnoIzplacilo": [(Math.round(totalDistance * tarifa.value * 100) / 100) + parseInt(dodatniStroski.value)],
+                    "SkupajKilometrina": [Math.round(totalDistance * tarifa.value * 100) / 100],
+                    "DodatniStroski": [dodatniStroski.value],
                     //Take all the numbers in tempRelacije and get the coresponding names from lokacije and join them with a /.
                     "Relacija": [new Array(...tempRelacije).map(function(relacija){
                         return lokacije[relacija];
                     }).join(' / ')],
-                    "Razlog": [tempRazlog]
+                    "Razlog": [razlog.value]
 
                 });
                 let secondOut = await PDFLib.PDFDocument.load(out);
+                //for each file in slikeUrl, add a page to the pdf, load the image, and add it to the page.
+                for(let i = 0; i < slikeUrl.length; i++){
+                    let page = secondOut.addPage();
+                    //load the image depending on the type of the file.
+                    let img = await secondOut.embedJpg(slikeUrl[i]);
+                    /* let img = await secondOut.embedPng(slikeUrl[i]); */
+                    let { width, height } = page.getSize();
+
+                    if(img.width > img.height){//landscape
+                        //draw the image on the page, with the width of the page and the height of the image scaled to the width of the page.
+                        page.drawImage(img, {
+                            x: 0,
+                            y: 0,
+                            width: width,
+                            height: img.height * (width / img.width)
+                        });
+                    }else {//portrait
+                        //draw the image on the page, with the height of the page and the width of the image scaled to the height of the page.
+                        page.drawImage(img, {
+                            x: 0,
+                            y: 0,
+                            width: img.width * (height / img.height),
+                            height: height
+                    });
+                    }
+                    
+                }
                 //ad a page to the pdf
-                let page = secondOut.addPage();
+                //let page = secondOut.addPage();
                 //ad a image to the page
-                /* var img = new Image();
-                img.src = "images/image1.png"; */
                 //save the pdf
                 out = await secondOut.save();
 
